@@ -1,0 +1,12 @@
+# configuracio intellij
+
+.idea
+
+# pycache
+
+
+
+# altres
+
+#ignore all in migrations but __init__.py
+

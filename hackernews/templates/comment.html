@@ -1,0 +1,77 @@
+{% load hackernews_extra %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script src="{{ STATIC_URL }}/static/js/vote.js"></script>
+
+<tr class="athing comtr " id="22872337">
+   <td>
+      <table border="0">
+         <tbody>
+            <tr>
+               <td class="ind"><img src="https://news.ycombinator.com/s.gif" height="1" width="{{reply.get_depth}}"></td>
+               <td valign="top" class="votelinks">
+                  <center>
+                     {% if not user.is_authenticated %}
+                    <button onclick="location.href = '/login/google-oauth2/?next=/';" id="myButton" class="votearrow"></button>
+                    {% elif reply.id_contribution in own  %}
+                     <font color="#ff6600">*</font><br>
+                     <img  height="1" width="16">  
+                    {% else %}
+                        {% if reply.id_contribution not in voted %}
+                            <button class="votearrow" id="vote{{ reply.id_contribution }}" likehref='{{ reply.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ reply.id_contribution }}'></button>
+                        {% else %}
+                            <button class="votearrowhidden" id="votehidden{{ reply.id_contribution }}" likehref='{{ reply.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ reply.id_contribution }}'></button>
+                        {% endif %}
+                    {% endif %}
+
+                  </center>
+               </td>
+               <td class="default">
+                  <div style="margin-top:2px; margin-bottom:-10px;"><span class="comhead">  
+
+                      <span class="storyon"></span>
+
+                     {%if user.id == reply.author.id%}
+                     <a href="{% url 'user' %}?id={{reply.author}}" class="hnuser">{{reply.author}}</a> <span class="age"><a href="{% url 'reply' %}?id={{reply.id_contribution}}">{{reply.whenpublished}}</a></span> | <a href="{% url 'edit' %}?id={{reply.id_contribution}}">edit</a> | <a href="{% url 'delete-confirm' %}?id={{reply.id_contribution}}">delete</a>
+                     {%else%}
+                     <a href="{% url 'user' %}?id={{reply.author}}" class="hnuser">{{reply.author}}</a> <span class="age"><a href="{% url 'reply' %}?id={{reply.id_contribution}}">{{reply.whenpublished}}</a></span>         <span class="storyon"></span>
+                     {%endif%}
+                    
+                    
+                     {% if user.is_authenticated %}
+
+                        {% if reply.id_contribution in voted %}
+                          <button class="unvote" id="unvote{{ reply.id_contribution }}" likehref='{{ reply.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ reply.id_contribution }}'>unvote </button>
+                        {% else %}
+                          <button class="unvotehidden" id="unvotehidden{{ reply.id_contribution }}" likehref='{{ reply.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ reply.id_contribution }}'>unvote</button>
+                        {% endif %}
+                      {% endif %}
+
+                     </span>
+                  </div>
+                  <br>
+
+                  <div class="comment">
+                     <span class="commtext c00">{{reply.text}}</span>
+                     {%if user.id != reply.author.id%}
+                        <div class="reply">
+                           <p><font size="1">
+                              <u><a href="{% url 'reply' %}?id={{reply.id_contribution}}">reply</a></u>
+                              </font>
+                           </p>
+                        </div>
+                     {% endif %}
+                  </div>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </td>
+</tr>
+     
+
+{%if reply.iam_reply%}
+{%for reply in reply.iam_reply.all%}
+{% include "comment.html" %}
+{%endfor%}
+{%endif%}

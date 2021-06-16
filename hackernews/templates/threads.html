@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load hackernews_extra %}
+{% block content  %}
+        {% for comment in comments %}
+            <tr class="athing comtr ">
+                <td>
+                <table border="0">
+                    <tbody>
+                        <tr>
+                            <td class="ind"><img height="1" width="0"></td>
+                            <td valign="top" class="votelinks">
+                                <center>
+                                    {% if not user.is_authenticated %}
+                                        <button onclick="location.href = '{% url 'submit' %}';" id="myButton" class="votearrow"></button>
+                        
+                                    {% elif contribution.id_contribution in own  %}
+                                        <font color="#ff6600">*</font>
+                                        <br>
+                                        <img height="1" width="14">
+                                    {% else %}
+                                        {% if contribution.id_contribution not in voted %}
+                                            <button class="votearrow" id="vote{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                                        {% else %}
+                                            <button class="votearrowhidden" id="votehidden{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                                        {% endif %}
+                                    {% endif %}
+                                </center>
+                            </td>
+                            <td class="default">
+                                <div style="margin-top:2px; margin-bottom:-10px;"><span class="comhead">
+                                    <span class="score">
+                                        {{comment.getpoints}}
+                                        {% if comment.getpoints == 1 %}
+                                            point
+                                        {% else %}
+                                            points
+                                        {% endif %}
+                                    </span>
+                                    by <a href="{% url 'user' %}?id={{comment.author.username}}" class="hnuser">{{comment.author.username}}
+                                
+                                    </a>
+                                    <span class="age">
+                                        <a href="{% url 'reply' %}?id={{comment.id_contribution}}">
+                                            {{comment.whenpublished}}
+                                        </a>
+                                    </span>
+                                    <span id="unv_22770674"></span>
+                                    <span class="par"> |
+                                            <a href="{% url 'item' %}?id={{comment.contribution_ref.id_contribution}}">parent</a>
+                                        </span>    
+                                            {% get_parameter_id  request as rq %}
+                                        {% if user.is_authenticated and  user.username == rq %}
+                                         |
+                                        <a href="{% url 'edit' %}?id={{comment.id_contribution}}">edit</a> |
+                                        <a href="{% url 'delete-confirm' %}?id={{comment.id_contribution}}">delete</a> 
+                                        {% endif %}
+                                        <a class="togg" n="1" href="javascript:void(0)" onclick="return toggle(event, 22770674)">[-]</a>
+                                            <span class="storyon"> | on: <a href="{% url 'item' %}?id={{comment.contribution_ref.id_contribution}}">{{comment.contribution_ref.get_short_title}}</a></span>
+                                    </span>
+                                </div>
+                                <br>
+                                <div class="comment">
+                                    <span class="commtext c00">{{comment.text}}</span>
+                                    <div class="reply">
+                                        <p><font size="1">
+                                            </font>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </td>
+            </tr>
+            {%if comment.iam_reply%}
+            {%for reply in comment.iam_reply.all%}
+                {% include "comment.html" %}
+            {%endfor%}
+            {%endif%}
+            {% endfor %}    
+ {% endblock content %}
+
+
+ 

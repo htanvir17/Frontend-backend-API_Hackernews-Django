@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load hackernews_extra %}
+{% block content  %}
+{% if contribution %}
+<tr>
+   <td>
+   <table class="fatitem" border="0">
+      <tbody>
+         <tr class="athing" id="{{contribution.id_contribution}}">
+            <td align="right" valign="top" class="title"><span class="rank"></span>
+            </td>
+               <td valign="top" class="votelinks">
+                  <center>
+                        {% if not user.is_authenticated %}
+                        <button onclick="location.href = '{% url 'submit' %}'';" id="myButton" class="votearrow"></button>
+                        {% elif contribution.id_contribution in own  %}
+                          <font color="#ff6600">*</font>
+                          <br>
+                          <img height="1" width="14">
+                        {% else %}
+                            {% if contribution.id_contribution not in voted %}
+                                <button class="votearrow" id="vote{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                            {% else %}
+                                <button class="votearrowhidden" id="votehidden{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                            {% endif %}
+                        {% endif %}
+                  </center>
+               </td>
+            <td class="title">
+               {% if contribution.get_cname == "ContributionUrl" %}
+                  <!-- URL  -->
+                  <a href="{{contribution.url}}" class="storylink" rel="nofollow">{{contribution.title}}</a>
+               <span class="sitebit comhead">
+                  (<a href="{{contribution.url}}">
+                     <span class="sitestr">{{contribution.get_base_url}}</span>
+                  </a>)
+                  </span>
+                  {% elif contribution.get_cname == "ContributionAsk" %}
+                  <!-- ASK -->
+                  <a href="{% url 'item' %}?id={{contribution.id_contribution}}" class="storylink" rel="nofollow">
+                        ASK HN: {{contribution.title}}
+                  </a>
+               {% endif %}
+         </td>
+         <tr>
+            <td colspan="2"></td>
+            <td class="subtext">
+               <span class="score" id="score{{ contribution.id_contribution }}" points="{{contribution.points.count}}">{{contribution.getpoints}}
+                    {% if contribution.getpoints == 1 %}
+                        point
+                    {% else %}
+                        points
+                    {% endif %}
+                </span> by <a href="{% url 'user' %}?id={{contribution.author}}" class="hnuser"> {{contribution.author}} </a>
+    
+                <span class="age">
+                    <a href="{% url 'item' %}?id={{ contribution.id_contribution }}"> {{contribution.whenpublished}} </a> |
+                </span>  
+                {% if user.is_authenticated %}
+                  {% if contribution.id_contribution in own %}
+                    <span> 
+                        <a href="{% url 'edit' %}?id={{contribution.id_contribution}}">edit</a> |
+                        <a href="{% url 'delete-confirm' %}?id={{contribution.id_contribution}}">delete</a>
+                    </span>   
+                  {% else %}
+                  {% if contribution.id_contribution in voted %} 
+                     <button class="unvote" id="unvote{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'>unvote |</button> 
+                  {% else %}
+                     <button class="unvotehidden" id="unvotehidden{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'>| unvote |</button>
+                  {% endif %}
+                      <a href="{% url 'item' %}?id={{contribution.id_contribution }}">
+                      {% if contribution.comments == 0 %}
+                         discuss 
+                      {% else %}
+                         {{ contribution.comments }} comments
+                      {% endif  %}
+                      </a> 
+                  {% endif %}
+               {%else%}
+               <a href="{% url 'item' %}?id={{contribution.id_contribution }}">
+                     {% if contribution.comments == 0 %}
+                        discuss 
+                     {% else %}
+                        {{ contribution.comments }} comments
+                     {% endif  %}
+               </a> 
+                    
+            {% endif %}
+               
+               </td>
+            </tr>
+            <tr style="height:2px"></tr>
+            <tr>
+               <td colspan="2"></td>
+               <td>
+                  {%if contribution.get_cname == 'ContributionAsk'%}
+                    {{contribution.text}}
+                  {%endif%}
+               </td>
+            </tr>
+            <tr style="height:10px"></tr>
+            {% if user.is_authenticated %}
+               {% if contribution.author.id != user.id  %}
+                  <tr>
+                     <td colspan="2"></td>
+                     <td>
+                        <!--when you press submit then will go 'comment' url that has linked in view with CommentPageView class, and inside the method post will check it-->
+                        <form method="post" action="comment">
+                           {% csrf_token %}
+                           <input type="hidden" name="parent" value="{{contribution.id_contribution}}">
+                           <input type="hidden" name = "parentcomment" value="null">
+                           <input type="hidden" name="goto" value="item?id={{contribution.id_contribution}}">
+                           <textarea name="text" rows="6" cols="60"></textarea>
+                           <input type="hidden" name="author_id" value="{{user.id}}">
+                           <br>
+                           <br>
+                           <input type="submit" value="add comment">
+                        </form>
+                     </td>
+                  </tr>
+               {% endif %}
+            {% else %}
+               <tr>
+                  <td colspan="2"></td>
+                  <td>
+                     <form method="get" action ="{% url 'submit' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent" value="{{contribution.id_contribution}}">
+                        <input type="hidden" name="goto" value="item?id={{contribution.id_contribution}}">
+                        <input type="hidden" name = "parentcoment" value="null">
+                        <textarea name="text" rows="6" cols="60"></textarea>
+                        <input type="hidden" name="author_id" value="">
+                        <br>
+                        <br>
+                        <input type="submit" value="add comment">
+                     </form>
+                  </td>
+               </tr>
+            {% endif %}
+         </tbody>
+      </table>
+      <br>
+      <br> 
+      <table border="0" class="comment-tree">
+         <tbody>
+            <!--this "comentaris" we send from view in a dictionari context-->
+            {%for comment in comentaris%}
+            <tr class="athing comtr " >
+               <td>
+                  <table border="0">
+                     <tbody>
+                        <tr>
+                           <td class = "ind">
+                              <img src = "https://news.ycombinator.com/s.gif" height="1" width="0">
+                           </td>
+                           <td valign="top" class="votelinks">
+                              <center>
+                                {% if not user.is_authenticated %}
+                                  <button onclick="location.href = '/login/google-oauth2/?next=/';" id="myButton" class="votearrow"></button>
+                                {% elif comment.id_contribution in own  %}
+                                    <font color="#ff6600">*</font><br>
+                                    <img  height="1" width="16">  
+                                {% else %}
+                                    {% if comment.id_contribution not in voted %}
+                                        <button class="votearrow" id="vote{{ comment.id_contribution }}" likehref='{{ comment.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ comment.id_contribution }}'></button>
+                                    {% else %}
+                                        <button class="votearrowhidden" id="votehidden{{ comment.id_contribution }}" likehref='{{ comment.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ comment.id_contribution }}'></button>
+                                    {% endif %}
+                                {% endif %}
+
+                              </center>
+                           </td>
+                           <td class="default">
+                              <div style="margin-top:2px; margin-bottom:-10px;">
+                                 <span class = "comhead">
+
+                                 {%if comment.author.id == user.id%}
+                                    <a href="{% url 'user' %}?id={{comment.author}}" class="hnuser">{{comment.author}}</a> <span class="age"><a href="{% url 'reply' %}?id={{comment.id_contribution}}">{{comment.whenpublished}}</a></span> | <a href="{% url 'edit' %}?id={{comment.id_contribution}}">edit</a> | <a href="{% url 'delete-confirm' %}?id={{comment.id_contribution}}">delete</a>
+                                 {%else%}
+                                     <a href="{% url 'user' %}?id={{comment.author}}" class="hnuser">{{comment.author}}</a> <span class="age"><a href="{% url 'reply' %}?id={{comment.id_contribution}}">{{comment.whenpublished}}</a></span>
+                                 {%endif%}
+                                
+                                 {% if user.is_authenticated %}
+                                    {% if comment.id_contribution in voted %}
+                                       <button class="unvote" id="unvote{{ comment.id_contribution }}" likehref='{{ comment.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ comment.id_contribution }}'>unvote</button>
+                                    {% else %}
+                                       <button class="unvotehidden" id="unvotehidden{{ comment.id_contribution }}" likehref='{{ comment.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ comment.id_contribution }}'>unvote</button>
+                                    {% endif %}
+                                 {% endif %}
+
+                                 </span>
+                              </div>
+                              <br>
+                              <div class="comment">
+                                 <span class="commtext c00">
+                                    {{comment.text}}
+                                    {%if comment.author.id != user.id%}
+                                       <div class="reply">
+                                       <p><font size="1">
+                                          <u><a href="{% url 'reply' %}?id={{comment.id_contribution}}">reply</a></u>
+                                          </font>
+                                       </p>
+                                       </div>
+                                    {% endif %}
+                                 </span>
+                              </div>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </td>
+            </tr>
+            <!--if the comment that we are analysing has replies, so we will print the hierarchy (comment.html)-->
+            {%if comment.iam_reply%}
+            {%for reply in comment.iam_reply.all%}
+            {% include "comment.html" %}
+            {%endfor%}
+            {%endif%}
+            {%endfor%}
+         </tbody>
+      </table>
+      <br>
+      <br>
+   </td>
+</tr>
+{% else %}
+<!-- Review: We have to evalute if the original HN shows this message or get an exception or another message  -->
+<p>The contribution does not exists.</p>
+{% endif%}
+{% endblock content %}

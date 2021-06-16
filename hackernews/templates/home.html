@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load hackernews_extra %}
+{% block content  %}
+   {% for contribution in contribution_list %}
+       <tr class="athing" id="{{contribution.pk}}">
+       <td align="right" valign="top" class="title"><span class="rank">{{ forloop.counter }}.</span></td>
+       <td valign="top" class="votelinks">
+           <center>
+               <!--this is vote part, due to use AJAX, if we want to vote in this page over a contribution and we are not logged so we have to login-->
+                {% if not user.is_authenticated %}
+                    <button onclick="location.href = '{% url 'submit' %}';" id="myButton" class="votearrow"></button>
+
+                {% elif contribution.id_contribution in own  %}
+                    <font color="#ff6600">*</font>
+                    <br>
+                    <img height="1" width="14">
+                {% else %}
+                    {% if contribution.id_contribution not in voted %}
+                        <button class="votearrow" id="vote{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                    {% else %}
+                        <button class="votearrowhidden" id="votehidden{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'></button>
+                    {% endif %}
+                {% endif %}
+           </center>
+       </td>
+
+       <!-- Contribution title -->
+       <td class="title">
+           {% if contribution.get_cname == "ContributionUrl" %}
+            <!-- URL  -->
+            <a href="{{contribution.url}}" class="storylink" rel="nofollow">{{contribution.title}}</a>
+            <span class="sitebit comhead">
+                (<a href="{{contribution.url}}">
+                    <span class="sitestr">{{contribution.get_base_url}}</span>
+                </a>)
+            </span>
+           {% else %}
+                <!-- ASK -->
+                <a href="{% url 'item' %}?id={{ contribution.id_contribution}}" class="storylink" rel="nofollow">
+                    ASK HN: {{contribution.title}}
+                </a>
+           {% endif %}
+       </td>
+   </tr>
+   <tr>
+       <td colspan="2"></td>
+       <td class="subtext">
+           <span class="score" id="score{{ contribution.id_contribution }}" points="{{contribution.points.count}}">{{contribution.getpoints}}
+                {% if contribution.getpoints == 1 %}
+                    point
+                {% else %}
+                    points
+                {% endif %}
+            </span>
+            by <a href="{% url 'user' %}?id={{contribution.author.username}}" class="hnuser"> {{contribution.author.username}} </a>
+            <span class="age">
+                    <a href="{% url 'item' %}?id={{contribution.id_contribution}}"> {{contribution.whenpublished}}  </a> |
+            </span>
+            {% if user.is_authenticated %}
+                {% if contribution.id_contribution in own %}
+                <span> 
+                    <a href="{% url 'edit' %}?id={{contribution.id_contribution}}">edit</a> |
+                    <a href="{% url 'delete-confirm' %}?id={{contribution.id_contribution}}">delete</a>
+                </span>   
+                {% else %}
+                    {% if contribution.id_contribution in voted %} 
+                        <button class="unvote" id="unvote{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'>unvote |</button> 
+                     {% else %}
+                         <button class="unvotehidden" id="unvotehidden{{ contribution.id_contribution }}" likehref='{{ contribution.get_api_like_url }}' userlike='{{ user.pk }}' contid='{{ contribution.id_contribution }}'>unvote |</button>  
+                    {% endif %}
+                    <a href="{% url 'item' %}?{% query_transform request id=contribution.id_contribution %}">
+                    {% if contribution.comments == 0 %}
+                        discuss 
+                    {% else %}
+                        {{ contribution.comments }} comments
+                    {% endif  %}
+                    </a>   
+                {% endif %}
+            {%else%}
+            <a href="{% url 'item' %}?{% query_transform request id=contribution.id_contribution %}">
+                {% if contribution.comments == 0 %}
+                    discuss 
+                {% else %}
+                    {{ contribution.comments }} comments
+                {% endif  %}
+            </a> 
+            {% endif %}
+       </td>
+   </tr>
+   <tr class="spacer" style="height:5px"></tr>
+{% endfor %}
+
+{% endblock content %}

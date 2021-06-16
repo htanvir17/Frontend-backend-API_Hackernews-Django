@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{%block content%}
+
+{%if user.is_authenticated and user.username == object.user.username%}
+    <tr><td>
+    <form method="post">{% csrf_token %}
+    <table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td bgcolor="#ffffaa"><table cellpadding="5" width="100%"><tbody><tr><td>Please put a valid address in the email field, or we won't be able to
+        send you a new password if you forget yours.  Your address is only
+        visible to you and us.  Crawlers and other users can't see it.
+            </td></tr></tbody></table></td></tr></tbody></table>
+            <table border="0">
+            <tbody>
+            <tr class="athing"><td valign="top">user:</td><td timestamp="1585266333"><a href="" class="hnuser">{{object.user.username}}</a></td></tr>
+            <tr><td valign="top">created:</td><td><a href="">{{object.whencreated}}</a></td></tr>
+            <tr><td valign="top">karma:</td>
+                <td>{{object.karma}}</td></tr>
+
+        <!--we use the field sended from view-->
+        {% for field in form %}
+        <tr><td>
+        {{ field.errors }}
+        {{ field.label_tag }} <td>{{ field }}</td>
+        </td></tr>
+        {% endfor %}
+        <tr><td valign="top">API Key:</td><td>
+            {{object.apikey}}  </td></tr>
+
+
+
+
+    <tr><td></td><td><a href="submitted?id={{ user.username }}"><u>submissions</u></a></td></tr>
+    <tr><td></td><td><a href="threads?id={{ object.user.username }} "><u>comments</u></a></td></tr>
+    <tr><td></td><td><a href="{% url 'upvoted' %}?id={{object.user.username}}"><u>upvoted submissions</u></a> /
+            <a href="{% url 'upvotedcomments' %}?id={{object.user.username}}&comments=t"><u>comments</u></a>
+
+    &nbsp;<span style="font-style:italic">(private)</span></td></tr>
+    <tr><td></td></tr>
+    <tr><td>
+    <br>
+    <input type="submit" value="update"></td></tr>
+    </form>
+    <tr><td><br>
+    <br></td></tr>
+    </tbody>
+    </table>
+    </td></tr>
+{%else%}
+    <tr><td><table border="0"><tbody><tr class="athing"><td valign="top">user:</td><td timestamp="1576632256"><a href="" class="hnuser">{{object.user.username}}</a></td></tr>
+        <tr><td valign="top">created:</td><td><a  href="">{{object.whencreated}}</a></td></tr>
+        <tr><td valign="top">karma:</td><td>
+                {{object.karma}}          </td></tr>
+        <tr><td valign="top">about:</td><td>
+            {{object.about}}  </td></tr>
+                <tr><td></td><td><a href="submitted?id={{object.user.username}}"><u>submissions</u></a></td></tr><tr><td></td><td><a href="threads?id={{ object.user.username }}"><u>comments</u></a></td></tr>
+
+        <tr><td></td><td>
+            </td></tr>
+    </tbody></table>
+    <br><br>
+    </td></tr>
+{% endif %}
+{% endblock content%}

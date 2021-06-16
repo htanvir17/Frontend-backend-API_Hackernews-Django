@@ -1,0 +1,108 @@
+<!--we don't extend base.html because we don't need top and bottom part of base, so we have to render diferent content-->
+{% load static %}
+{% block content %}
+<html op="submit">
+    <head>
+        <meta name="referrer" content="origin">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{% static 'css/base.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="favicon.ico">
+        <title>Submit | Hacker News</title>
+    </head>
+    <body>
+        <center>
+            <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+                <tbody>
+                    <tr>
+                        <td bgcolor="#ff6600">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:18px;padding-right:4px">
+                                            <a href="{% url 'home' %}">
+                                                <img src="https://news.ycombinator.com/y18.gif" width="18" height="18" style="border:1px #ffffff solid;">
+                                            </a>
+                                        </td>
+                                        <td style="line-height:12pt; height:10px;">
+                                            <span class="pagetop">
+                                                <b>Submit</b>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr style="height:10px"></tr>
+                    <tr>
+                        <td>
+                            {% if not user.is_authenticated %}
+                                            <p>You have to be logged in order to perform this action.</p>
+                                            <a  href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">
+                                                Login by Google
+                                            </a>
+                            {% else %}
+                            <!--when you submit a contribution, the mothod post declared in view will evaluate, if all ok, the view will send /newest, so in this case action="" is means nothing-->
+                            <form action="" method="post">{% csrf_token %}
+                                <script type="text/javascript">
+                                    function tlen(el) {
+                                        var n = el.value.length - 80;
+                                        el.nextElementSibling.innerText = n > 0 ? n + ' too long' : '';
+                                    }
+                                </script>
+                                <!--this variable form is defined in view-->
+                                <p>{{ form.title.errors }}</p>
+                                <table border="0">
+                                    <tbody>
+                                        <tr>
+                                            <td>title</td>
+                                            <td>
+                                                <input type="text" name="title" value="" size="50" oninput="tlen(this)" onfocus="tlen(this)">
+                                                <span style="margin-left:10px"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>url</td>
+                                            <td>
+                                                <p> {{ form.url }} </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td><b>or</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>text</td>
+                                            <td>
+                                                <p> {{ form.text }} </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                <input type="hidden" name="author_id" value={{user.id}}>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td><input type="submit" value="submit"></td>
+                                        </tr>
+                                        <tr style="height:20px"></tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread.<br><br>
+                                                You can also submit via <a href="bookmarklet.html" rel="nofollow"><u>bookmarklet</u></a>.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </center>
+    </body>
+</html>
+{% endblock content %}

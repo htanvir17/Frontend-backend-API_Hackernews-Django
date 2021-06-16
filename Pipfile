@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+whitenoise = "*"
+gunicorn = "*"
+django = "*"
+django-polymorphic = "*"
+apiview = "*"
+django-allauth = "*"
+python-social-auth = {extras = ["django"],version = "*"}
+django-rest-multiple-models = "*"
+django-cors-headers = "*"
+drf-yasg = "*"
+djangorestframework-api-key = "*"
+rest-social-auth = "*"
+oauth2-provider = "*"
+django-rest-framework-social-oauth2 = "*"
+
+[requires]
+python_version = "3.7"

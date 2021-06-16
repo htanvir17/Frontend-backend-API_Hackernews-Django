@@ -1,0 +1,1962 @@
+openapi: 3.0.1
+
+info:
+  title: HackerNews API
+  version: "1.0.0"
+  description: "This is the Open API documentation for the REST API of our beloved application **HackerNews** deployed at <https://hackers-asw.herokuapp.com/>. <br> The API needs a key validation in order to **Authorize** the request of all the operations (`GET`,`POST`,`PUT`, `DELETE`). <br>
+    <br>
+    `CREATED BY:` <br>
+      **- Adrian Roman** <br>
+      **- Franco Araujo**   <br>
+      **- Kenny Alejandro**     <br>
+      **- Shamsa Kanwal**   <br>
+      **- Tanvir Hossain**  <br> "
+servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Fibness_Inc/ASW_HackerNews/1.0.0
+  - url: 'https://hackers-asw.herokuapp.com/'
+  - url: 'https://367d45f179fb.ngrok.io'
+paths:
+  /api/asks:
+    get:
+      tags:
+      - Asks
+      description: Gets a list of **ContributionAsk**
+      operationId: api_asks_list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: ArrayOfContributionAsk
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContributionAsk'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+    post:
+      tags:
+      - Asks
+      description: Adds a new **ContributionAsk** to `HackerNews`
+      operationId: api_asks_add
+      requestBody:
+        description: Provide the `title` & `text` of the new **ContributionAsk**
+        content:
+          application/json:
+            schema:
+              required:
+              - title
+              - text
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                  example: 'My title'
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My text'
+        required: true
+      responses:
+        201:
+          description: ContributionAsk created
+          content:
+            application/json:
+              schema:
+                example: {id_contribution: 2, title: "My title", created_date: "2020-05-03T11:19:55.473Z", text: "My text", author: "Bob", points: 1}
+          
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Title can not be empty - Title is too long (maximum is 80 characters) - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+  
+  
+
+  /api/asks/{id}:
+    get:
+      tags:
+      - Asks
+      description: Gets the description of **ContributionAsk** object by `id`
+      parameters:
+      - name: id
+        description: Id of the **ContributionAsk**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentHierarchy'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Ask'        
+  
+    put:
+      tags:
+      - Asks
+      description: Update an **ContributionAsk** object by `id`
+      parameters:
+      - name: id
+        in: path
+        description: ID of a **ContributionAsk**
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - title
+              - text
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                  example: 'My title modified'
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My text modified'
+        required: true
+      responses:
+        200:
+          description: Modified
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Title can not be empty - Title is too long (maximum is 80 characters) - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Ask'
+    delete:
+      tags:
+      - Asks
+      description: Delete an **ContributionAsk** object by `id`
+      parameters:
+      - name: id
+        in: path
+        description: ID of a **ContributionAsk** 
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: No content
+          content:
+            application/json: {}
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Ask'
+                                  
+  
+                  
+  /api/asks/{id}/comments:
+    get:
+      tags:
+      - Asks
+      description: Gets `comments` from specific **ContributionAsk**
+      parameters:
+      - name: id
+        description: Id of the **ContributionAsk**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Threads'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Ask'
+    post:
+      tags:
+      - Asks
+      description: Add a `comment` to a specified **ContributionAsk** 
+      parameters:
+      - name: id
+        description: Id of the **ContributionAsk**
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My comment'
+        required: true
+      responses:
+        201:
+          description: ContributionComment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionComment'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You can''t comment your own Contribution'}
+
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Ask'
+
+  /api/asks/{id}/comments/{commentId}:
+    get:
+      tags:
+      - Asks
+      description:  Gets `comment`details from specific **ContributionAsk** 
+      parameters:
+      - name: id
+        description: Id of the  **ContributionAsk**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        description: Id of the **comment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Threads'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'The ContributionComment(commentID=10) isn''t a comment of the Contribution(ID=3)' }
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404AskComment'
+    
+
+    post:
+      tags:
+      - Asks
+      description: Add a `reply` to a specified **ContributionComment**
+      parameters:
+      - name: id
+        description: Id of the **ContributionComment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        description: Id of the **comment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My reply'
+        required: true
+      responses:
+        201:
+          description: ContributionReply created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionReply'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You can''t reply your own Comment'}
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'No Contribution with that ID - No ContributionComment with that commentId'}
+                  
+    
+    put:
+      tags:
+      - Asks
+      description: Updates a specific `comment` from specific **ContributionAsk** 
+      parameters:
+      - name: id
+        description: Id of the  **ContributionAsk**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        description: Id of the **comment** or **reply**
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My modified comment'
+        required: true
+      responses:
+        200:
+          description: Modified
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: Object not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404AskComment'
+    delete:
+      tags:
+      - Asks
+      description: Deletes a specific `comment` from specific **ContributionAsk**
+      parameters:
+      - name: id
+        in: path
+        description: Id of the  **ContributionAsk**
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        description: Id of the **comment** or **reply**
+        required: true
+        schema:
+          type: integer
+      responses:
+        204:
+          description: No content
+          content:
+            application/json: {}
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404AskComment'
+  
+  
+  
+  
+  
+
+  /api/urls:
+    get:
+      tags:
+      - Urls
+      description: Gets a list of **ContributionUrl** 
+      operationId: api_urls_list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContributionUrl'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+    post:
+      tags:
+      - Urls
+      description: Adds a new **ContributionUrl** to `HackerNews`
+      operationId: api_url_add
+      requestBody:
+        description: Provide the `title` & `url` of the new **ContributionUrl**
+        content:
+          application/json:
+            schema:
+              required:
+              - title
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                  example: 'My title'
+                url:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                  example: "https://atenea.upc.edu/"
+        required: true
+      responses:
+        201:
+          description: ContributionUrl created
+          content:
+            application/json:
+              schema:
+                example: {id_contribution: 2, title: "My title", created_date: "2020-05-03T11:19:55.473Z", url: "https://atenea.upc.edu/", author: 1, points: 1}
+                
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Title can not be empty - Title is too long (maximum is 80 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        409:
+          description: 'Error: Conflict'
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ErrorResult'
+              example: {error: Url already exists,
+                        contribution: {id_contribution: 2, title: "My title", created_date: "2020-05-03T11:19:55.473Z",
+                        url: "https://atenea.upc.edu/", author: 1, points: 2}
+                      }
+
+
+
+  /api/urls/{id}:
+    get:
+      tags:
+      - Urls
+      description: Gets the description of **ContributionUrl** object by `id`
+      parameters:
+      - name: id
+        description: Id of the **ContributionUrl**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentHierarchy'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Url'
+    
+    put:
+      tags:
+      - Urls
+      description: Update an **ContributionUrl** object by `id`
+      parameters:
+      - name: id
+        in: path
+        description: ID of a **ContributionUrl**
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - title
+              - url
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+                  example: 'My title modified'
+        required: true
+      responses:
+        200:
+          description: Modified
+
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Title can not be empty - Title is too long (maximum is 80 characters' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Url'
+    delete:
+      tags:
+      - Urls
+      description: Delete an **ContributionUrl** object by `id`
+      operationId: deleteContributionUrl
+      parameters:
+      - name: id
+        in: path
+        description: ID of a **ContributionUrl** 
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: No content
+          content:
+            application/json: {}
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Url'
+  
+
+  /api/urls/{id}/comments:
+    get:
+      tags:
+      - Urls
+      description: Gets `comments` from specific **ContributionUrl**.
+      parameters:
+      - name: id
+        description: Id of the **ContributionUrl**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Threads'
+        
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Url'
+    post:
+      tags:
+      - Urls
+      description: Add a `comment` to a specified **ContributionUrl** 
+      parameters:
+      - name: id
+        description: Id of the **ContributionUrl**
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My comment'
+        required: true
+      responses:
+        201:
+          description: ContributionComment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionComment'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You can''t comment your own Contribution'}
+
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404Url'
+                  
+  /api/urls/{id}/comments/{commentId}:
+    get:
+      tags:
+      - Urls
+      description:  Gets `comment`details from specific **ContributionUrl**
+      parameters:
+      - name: id
+        description: Id of the  **ContributionUrl**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        description: Id of the **comment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Threads'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'The ContributionComment(commentID=10) isn''t a comment of the Contribution(ID=3)' }
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404UrlComment'
+    post:
+      tags:
+      - Urls
+      description: Add a `reply` to a specified **ContributionComment**
+      parameters:
+      - name: id
+        description: Id of the **ContributionComment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        description: Id of the **comment**
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My reply'
+        required: true
+      responses:
+        201:
+          description: ContributionReply created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionReply'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You can''t reply your own Comment'}
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'No Contribution with that ID - No ContributionComment with that commentId'}
+    
+    
+    
+    
+    put:
+      tags:
+      - Urls
+      description: Updates a specific `comment` from specific **ContributionUrl**
+      parameters:
+      - name: id
+        description: Id of the  **ContributionUrl**
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        description: Id of the **comment** or **reply**
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - text
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My modified comment'
+        required: true
+      responses:
+        200:
+          description: Modified
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Text can not be empty - Text is too long (maximum is 500 characters)' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404UrlComment'
+    delete:
+      tags:
+      - Urls
+      description: Deletes a specific `comment` from specific **ContributionUrl**
+      parameters:
+      - name: id
+        in: path
+        description: Id of the  **ContributionUrl**
+        required: true
+        schema:
+          type: integer
+      - name: commentId
+        in: path
+        description: Id of the **comment** or **reply**
+        required: true
+        schema:
+          type: integer
+      responses:
+        204:
+          description: No content
+          content:
+            application/json: {}
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404UrlComment'
+
+  
+  /api/contributions/{id}/votes:
+    post:
+      tags:
+      - Votes
+      description: Add a `vote` to a specified Contribution that can be **ContributionAsk**,  **ContributionUrl**, **ContributionComment**,  **ContributionReply**
+      operationId: api_vote_create
+      parameters:
+      - name: id
+        description: Id of the **Contribution**
+        in: path
+        required: true
+        schema:
+          type: integer
+
+      responses:
+        201:
+          description: Vote created
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You can''t vote your own Contribution'}
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+        409:
+          description: 'Error: Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You have already voted this contribution'}
+
+    delete:
+      tags:
+      - Votes
+      description: Deletes a specific `vote` from specific Contribution that can be **ContributionAsk**,  **ContributionUrl**, **ContributionComment**,  **ContributionReply**
+      operationId: deleteVote
+      parameters:
+      - name: id
+        in: path
+        description: Id of the  **Contribution**
+        required: true
+        schema:
+          type: integer
+
+      responses:
+        204:
+          description: No content
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+        409:
+          description: 'Error: Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'You did not vote this contribution. Therefore, you cannot unvote'}
+
+
+
+  /api/profile:
+    get:
+      tags:
+      - User
+      description: Gets information about `users`
+      operationId: profile_list
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+
+  /api/profile/{username}:
+
+    get:
+      tags:
+      - User
+      description: Gets information about a specific `user`
+      operationId: api_profile_list
+      parameters:
+      - name: username
+        description: Profile username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'No Profile with that username'}
+
+
+    put:
+      tags:
+      - User
+      description: Update user ***Profile** object
+      parameters:
+      - name: username
+        in: path
+        description: Profile username
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                about:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: 'My description modified'
+        required: true
+      responses:
+        200:
+          description: Success
+
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: { error: 'Description is too long (maximum is 500 characters' }
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'No Profile with that username'}
+
+
+  /api/threads/{username}:
+    get:
+      tags:
+      - User
+      description: Gets `threads` of a specific `user`
+      operationId: api_threads_list
+      parameters:
+      - name: username
+        description: Username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Threads'
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              example: {error: 'No User with that username'}
+
+  /api/upvotedSubmissions/{username}:
+
+      get:
+        tags:
+        - User
+        description: Gets a list of upvoted **submissions** ( **contributionAsk** or **contributionUrl** ) made by the `user`
+        operationId: api_upvotedsubmissions_list
+        parameters:
+        - name: username
+          description: User username
+          in: path
+          required: true
+          schema:
+            type: string
+        responses:
+          200:
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UpvotedSubmissions'
+          401:
+            description: 'Error: Unauthorized'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResult'
+                examples:
+                  errorExample:
+                    $ref: '#/components/examples/error401'
+          404:
+            description: 'Error: Not Found'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResult'
+                example: {error: 'No User with that username'}
+                
+  /api/upvotedComments/{username}:
+
+      get:
+        tags:
+        - User
+        description: Gets a list of upvoted comments made by the `user`
+        operationId: api_upvotedComments_list
+        parameters:
+        - name: username
+          description: User username
+          in: path
+          required: true
+          schema:
+            type: string
+        responses:
+          200:
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/UpvotedComments'
+          401:
+            description: 'Error: Unauthorized'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResult'
+                examples:
+                  errorExample:
+                    $ref: '#/components/examples/error401'
+          404:
+            description: 'Error: Not Found'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResult'
+                example: {error: 'No User with that username'}
+
+components:
+
+  securitySchemes:
+    ApiKeyAuth:        # arbitrary name for the security scheme
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: Authorization  # name of the header, query parameter or cookie
+
+
+  schemas:
+    ContributionAsk:
+      required:
+        - title
+        - author
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 2
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: 'My title'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My text'
+        author:
+          type: string
+          example: 'Bob'
+        points:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          example: 2
+
+    ContributionUrl:
+      required:
+        - title
+        - author
+        - url
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 2
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: 'My title'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        url:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          example: 'https://atenea.upc.edu/'
+        author:
+          type: string
+          example: 'Bob'
+        points:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          example: 3
+
+    ContributionComment:
+      required:
+        - text
+        - author
+        - contribucion_ref
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My comment'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Bob'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 3
+        points:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          example: 2
+
+
+    ContributionReply:
+      required:
+        - text
+        - author
+        - contribucion_ref
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 14
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My reply'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Bob'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 3
+        parent:
+          title: Parent
+          type: integer
+          example: 1
+        points:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          example: 2
+
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        name:
+          type: string
+          example: 'Bob'
+          readOnly: true
+        created:
+          type: string
+          readOnly: true
+        karma:
+          type: integer
+          format: int64
+          example: 1
+          readOnly: true
+        about:
+          type: string
+          example: 'My description'
+
+    Threads:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My comment'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Bob'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 3
+        points:
+          type: integer
+          format: int32
+          example: 2
+        contribution_ref_title:
+          type: string
+          example: "Short contribution ref's title"
+
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionReply2'
+
+
+    ContributionReply2:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 14
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My reply'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Eve'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 11
+        parent:
+          title: Parent
+          type: integer
+          example: 10
+        points:
+          type: integer
+          format: int32
+          example: 1
+
+    CommentHierarchy:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 10
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: 'My title'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My text'
+        author:
+          type: string
+          example: 'Alice'
+        points:
+          type: integer
+          format: int32
+          example: 2
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionCommentReply'
+
+
+
+    ContributionCommentReply:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 11
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My comment'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Bob'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 10
+        points:
+          type: integer
+          format: int32
+          example: 1
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionReply2'
+
+    UpvotedComments:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 11
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My comment'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          type: string
+          example: 'Bob'
+        contribution_ref:
+          title: Contribution ref
+          type: integer
+          example: 10
+        points:
+          type: integer
+          format: int32
+          example: 1
+        contribution_ref_title:
+          type: string
+          example: "Short contribution ref's title"
+          
+          
+    UpvotedSubmissions:
+      type: object
+      properties:
+        id_contribution:
+          type: integer
+          format: int64
+          example: 2
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: 'My title'
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 'My text'
+        url:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          example: 'https://atenea.upc.edu/'
+        author:
+          type: string
+          example: 'Bob'
+        points:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
+          example: 2
+
+
+    ErrorResult:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum: [400, 401, 403, 404, 409]
+        error:
+          type: string
+          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+        message:
+          type: string
+
+  examples:
+    error400:
+      value:
+        error: "Title is too long (maximum is 80 characters)"
+    error401:
+      value:
+        error: "You provided no api key (X-API-KEY Header) or the one you provided is invalid"
+    error403:
+      value:
+        error: "Your api key (X-API-KEY Header) is not valid to do this request"
+    error404:
+      value:
+        error: "No Contribution with that ID"
+    error404Ask:
+      value:
+        error: "No ContributionAsk with that ID"
+    error404Url:
+      value:
+        error: "No ContributionUrl with that ID"
+    error404AskComment:
+      value:
+        error: "No ContributionAsk with that ID - No ContributionComment with that commentId"
+    error404UrlComment:
+      value:
+        error: "No ContributionUrl with that ID - No ContributionComment with that commentId"
+
+security:
+  - ApiKeyAuth: []     # use the same name as under securitySchemes

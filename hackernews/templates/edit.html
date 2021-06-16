@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load hackernews_extra %}
+{% block content  %}
+    {% if object_list.0 %}
+        <!--view will send a contribution, it can be url or ask-->
+        {% if object_list.0.author == user %} 
+            <tr>
+                <td>
+                <table class="fatitem" border="0">
+                    <tbody>
+                        <tr class="athing" id="22831107">
+                            <td align="right" valign="top" class="title"><span class="rank"></span></td>
+                            <td valign="top" class="votelinks">
+                                <center>
+                                    <font color="#ff6600">*</font>
+                                    <br>
+                                    <img height="1" width="14">
+                                </center>
+                            </td>
+                            <td class="title">
+                                {% if object_list.0.get_cname == "ContributionUrl" %}
+                                    <!-- URL  -->
+                                    <a href="{{object_list.0.url}}" class="storylink" rel="nofollow">{{object_list.0.title}}</a>
+                                <span class="sitebit comhead">
+                                    (<a href="{{object_list.0.url}}">
+                                        <span class="sitestr">{{object_list.0.get_base_url}}</span>
+                                    </a>)
+                                </span>
+                                {% else %}
+                                    <!-- ASK -->
+                                    <a href="{% url 'item' %}?id={{object_list.0.id_contribution}}" class="storylink" rel="nofollow">
+                                            {{object_list.0.title}}
+                                    </a>
+                                {% endif %} 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="subtext">
+                                <span class="score">{{object_list.0.getpoints}}
+                                    {% if object_list.0.points == 1 %}
+                                        point
+                                    {% else %}
+                                        points
+                                    {% endif %}
+                                </span>
+                                by <a href="{% url 'user' %}?id={{object_list.0.author}}" class="hnuser"> {{object_list.0.author}} </a> 
+                                <span class="age">
+                                        <a href="{% url 'item' %}?id={{object_list.0.id_contribution }}"> {{object_list.0.whenpublished}}  </a> |
+                                </span>
+                                <a href="{% url 'edit' %}?id={{object_list.0.id_contribution}}">edit</a> | 
+                                <a href="{% url 'delete-confirm' %}?id={{object_list.0.id_contribution }}">delete</a> 
+                            </td>
+                        </tr>
+                        <tr style="height:2px"></tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            {% if object_list.0.get_cname == "ContributionAsk" %}
+                                    <!-- ASK -->
+                                    <td>{{object_list.0.text}}</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <!--when we press update then will execute post method and then will perform this action-->>
+                <!--this form is SubmitEditForm-->
+                <form class="itemform" method="post" action="edit?id={{object_list.0.id_contribution}}">
+                    {% csrf_token %}
+                    <script type="text/javascript">function tlen(el) { var n = el.value.length - 80; el.nextSibling.innerText = n > 0 ? n + ' too long' : ''; }</script>
+                    {%if form.title.errors %}
+                        <h5> {{ form.title.errors }}</h5>
+                        {% endif %}
+                    <input type="hidden" name="id" value="{{object_list.0.id_contribution}}">
+                    <input type="hidden" name="goto" value="edit?id={{object_list.0.id_contribution}}">
+                    <table border="0">
+                        <tbody>
+                            <tr>
+                            <td valign="top">title:</td>
+                            <td>{{ form.title }}
+                            </tr>
+                            <tr>
+                                {% if object_list.0.get_cname == "ContributionUrl" %}
+                            <td valign="top">url:</td>
+                            <td>
+                                    {{object_list.0.url}}
+                            </td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                            {% if object_list.0.get_cname == "ContributionAsk" %}
+                                <td valign="top">text:</td>
+                                <td>
+                                    <p> {{ form.text }} <a href="{% url 'formatdoc' %}" tabindex="-1"><font color="#afafaf">help</font></a></font> </p>
+                                </td>
+                            {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br><input type="submit" value="update">
+                </form>
+                </td>
+            </tr>
+        
+        {% else %}
+            <p>You can't edit that.</p>
+        {% endif %}
+    {% else %} 
+        <p>The contribution does not exists.</p>
+    {% endif %}
+ {% endblock content  %}
